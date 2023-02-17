@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" >
+
+<!-- Mirrored from digitonaut.com/art/neon_marble/ by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 16 Feb 2023 12:55:06 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+<meta charset='utf-8'\>
+<meta name='apple-mobile-web-app-capable' content='yes'><meta name='apple-mobile-web-app-status-bar-style' content='black-translucent'><title>Neon Marble</title>
+
+</head>
+<body style='margin:0px;background:0px;'>
+
+<!-- Vertex Shader -->
+<script id="vertexShader" type="x-shader/x-vertex">
+  attribute vec3 color;
+
+  uniform float time;
+  uniform float size;
+
+  varying vec4 vMvPosition;
+  varying vec3 vColor;
+  
+  float map(float value, float beforeMin, float beforeMax, float afterMin, float afterMax) {
+    return afterMin + (afterMax - afterMin) * ((value - beforeMin) / (beforeMax - beforeMin));
+  }
+
+  void main() {
+      vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+      vMvPosition = mvPosition;
+      vColor = color;
+
+      gl_PointSize = (size + map(sin(time * 0.05), -1.0, 1.0, -100.0, 100.0)) * (100.0 / length(mvPosition.xyz));
+      gl_Position = projectionMatrix * mvPosition;
+  }
+</script>
+
+<script id="fragmentShader" type="x-shader/x-fragment">
+  uniform sampler2D texture;
+  uniform float time;
+
+  varying vec4 vMvPosition;
+  varying vec3 vColor;
+
+  void main() {
+      float opacity = 200.0 / length(vMvPosition.xyz);
+
+      vec2 uv = gl_PointCoord.xy * 2.0 - 1.0;
+
+      float orb = 0.1 / length(vec2(0.0) - uv) * step(0.5, 1.0 - length(uv));
+      orb = smoothstep(0.0, 1.0, orb);
+
+      vec3 color = vec3(orb) * vColor;
+
+      gl_FragColor = vec4(color, 1.0);
+  }
+</script>
+<script src='95_three.min.js'></script>
+<script  src="script.js"></script>
+
+</body>
+
+<!-- Mirrored from digitonaut.com/art/neon_marble/ by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 16 Feb 2023 12:55:12 GMT -->
+</html>

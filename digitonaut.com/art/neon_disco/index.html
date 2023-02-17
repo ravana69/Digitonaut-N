@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" >
+
+<!-- Mirrored from digitonaut.com/art/neon_disco/ by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 16 Feb 2023 12:55:04 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+<meta charset='utf-8'\>
+<meta name='apple-mobile-web-app-capable' content='yes'><meta name='apple-mobile-web-app-status-bar-style' content='black-translucent'><title>Neon Disco</title>
+
+<link rel="stylesheet" href="reset.min.css">
+
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!-- Vertex Shader -->
+<script id="vertexShader" type="x-shader/x-vertex">
+  varying vec2 vUv;
+
+  void main() {
+      vUv = uv;
+
+      vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+
+      gl_Position = projectionMatrix * mvPosition;
+  }
+</script>
+
+<script id="sphereFragmentShader" type="x-shader/x-fragment">
+  uniform sampler2D texture;
+  uniform float time;
+  uniform vec2 resolution;
+
+  varying vec2 vUv;
+
+  void main( void ) {
+      vec2 uv = (vUv.xy * resolution * 2.0 - resolution.xy) / min(resolution.x, resolution.y);
+
+      uv *= sin(length(uv * fract(time) * 10.0));
+
+      float r = 0.15 * abs(sin(time * cos(time * 5.0))) / abs(0.5 - length(uv));
+      float g = 0.18 * abs(sin(time * cos(time * 5.0)) + 1.0) / abs(0.46 - length(uv));
+      float b = 0.15 * abs(sin(time * cos(time * 5.0))) / abs(0.54 - length(uv));
+
+      gl_FragColor = vec4(vec3(r, g * 0.1, b), 1.0);
+  }
+</script>
+
+<!-- Fragment Shader -->
+<script id="fragmentShader" type="x-shader/x-fragment">
+  varying vec2 vUv;
+
+  uniform sampler2D texture;
+  uniform float time;
+  uniform vec2 resolution;
+  uniform vec3 baseColor;
+
+  const float PI = 3.14159;
+  const float N = 90.0;
+
+  float random(float n) {
+      return fract(abs(sin(n * 55.753) * 367.34));
+  }
+
+  void main(){
+      vec2 uv = (vUv.xy * resolution * 2.0 - resolution.xy) / min(resolution.x, resolution.y);
+
+      uv *= 8.0;
+
+      float brightness = 0.0;
+      float speed = time * 1.0;
+
+      for (float i = 0.0;  i < N;  i++) {
+          brightness += 0.002 / abs(sin(PI * uv.x) * sin(PI * uv.y) * sin(PI * speed + random(floor(uv.x )) + random(floor(uv.y))));
+      }
+
+      gl_FragColor = vec4(baseColor * brightness, 1.0);
+  }
+</script>
+<!-- partial -->
+  <script src='../../../cdnjs.cloudflare.com/ajax/libs/three.js/96/three.min.js'></script>
+  <script  src="script.js"></script>
+
+</body>
+
+<!-- Mirrored from digitonaut.com/art/neon_disco/ by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 16 Feb 2023 12:55:06 GMT -->
+</html>
